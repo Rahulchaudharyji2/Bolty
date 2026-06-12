@@ -13,12 +13,24 @@ graph TD
     User([Browser Client]) <--> |HTTP/WS| Frontend[apps/frontend: Next.js]
     Frontend <--> |HTTP| PrimaryBackend[apps/primarybackend: Express]
     Frontend <--> |WS| WSRelayer[apps/ws_layer: WS Relayer]
-    WSRelayer <--> |WS| Worker[apps/worker: Prompt Processor & Dev Runner]
-    Worker <--> |Actions DB| Database[(PostgreSQL)]
-    PrimaryBackend <--> |DB Queries| Database
-    Worker -.-> |Hosts Preview| PreviewPort[Live App Preview: 8081]
-    Worker -.-> |Volume Mount| CodeServer[apps/code-server: Monaco IDE]
+    
+    PrimaryBackend <--> |DB Queries| Database[(PostgreSQL)]
+    
+    subgraph AWS Cloud Infrastructure (Production)
+        Orchestrator[apps/worker-orchestrator: Express] <--> |AWS ASG API| ASG[AWS Auto Scaling Group]
+        ASG <--> |Provisions| EC2[EC2 Sandbox Instance]
+        
+        subgraph EC2 Instance Workspace (Per Project)
+            WSRelayer <--> |WS| Worker[apps/worker: Prompt Processor & Dev Runner]
+            Worker <--> |Actions DB| Database
+            Worker -.-> |Hosts Preview| PreviewPort[Live App Preview: 8081]
+            Worker -.-> |Volume Mount| CodeServer[apps/code-server: Monaco IDE]
+        end
+    end
+    
+    Frontend <--> |Requests Workspace IP| Orchestrator
 ```
+
 
 ### 1. Applications (`apps/`)
 
