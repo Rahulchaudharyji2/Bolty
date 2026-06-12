@@ -1,0 +1,54 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "boltapp"
+    },
+    {
+      "path": "apps/frontend",
+      "name": "frontend"
+    },
+    {
+      "path": "apps/primarybackend",
+      "name": "primarybackend"
+    },
+    {
+      "path": "apps/worker",
+      "name": "worker"
+    },
+    {
+      "path": "apps/ws_layer",
+      "name": "ws_layer"
+    },
+    {
+      "path": "packages/db",
+      "name": "db"
+    },
+    {
+      "path": "packages/redis",
+      "name": "redis"
+    }
+  ],
+  "settings": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "prisma.prisma",
+      "bradlc.vscode-tailwindcss",
+      "svelte.svelte-vscode"
+    ]
+  }
+}
