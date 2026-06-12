@@ -45,6 +45,55 @@ graph TD
 
 ---
 
+## ☁️ Cloud Architecture & Worker Orchestration (AWS)
+
+In production deployments, instead of hosting local containerized workspaces on a single host machine, the platform shifts to a dynamically scalable cloud architecture managed by the **[worker-orchestrator](file:///Users/rahulchaudhary/cohort/devops/boltapp/apps/worker-orchestrator)**. 
+
+This service communicates directly with Amazon Web Services (AWS) using the `@aws-sdk/client-auto-scaling` and `@aws-sdk/client-ec2` libraries.
+
+### 1. Dynamic Sandbox Provisioning Flow
+
+```mermaid
+sequenceDiagram
+    participant Client as Web Client
+    participant Frontend as Frontend App
+    participant Orchestrator as Worker Orchestrator
+    participant AWS as AWS Auto Scaling (ASG)
+    participant EC2 as EC2 Instances (Workspaces)
+
+    Client->>Frontend: Request Project Sandbox
+    Frontend->>Orchestrator: GET /:projectId
+    alt Idle machine available in pool
+        Orchestrator-->>Frontend: Return Machine IP
+        Frontend-->>Client: Load embedded VS Code & Preview
+    else No idle machines
+        Orchestrator->>AWS: Scale Out ASG (SetDesiredCapacity)
+        Orchestrator-->>Frontend: Return 503 "No idle machines"
+        AWS->>EC2: Spin up new instances
+        Note over Orchestrator,EC2: Background sync loop registers new instances into warm pool
+    end
+
+    Note over Client,EC2: After use / shutdown
+    Client->>Frontend: Delete / Close Sandbox
+    Frontend->>Orchestrator: POST /destroy (machineId)
+    Orchestrator->>AWS: Terminate instance & decrement desired capacity
+    AWS->>EC2: Terminate VM instance
+```
+
+### 2. Operational Details
+
+*   **Instance Discovery & Synchronization**: 
+    The orchestrator runs a background loop every 10 seconds (`refreshInstances()`) that:
+    1. Describes the instances in the `vscode-asg` AWS Auto Scaling Group.
+    2. Queries the AWS EC2 API (`DescribeInstancesCommand`) to fetch their IP addresses and public status.
+    3. Synchronizes them with the `All_MACHINES` registry.
+*   **Warm Buffer / Scaling Up**: 
+    To minimize VM launch latency for active users, the orchestrator guarantees a buffer of **at least 5 idle instances**. If the available idle pool drops below 5, it proactively invokes `SetDesiredCapacityCommand` to scale out the Auto Scaling Group.
+*   **Resource Teardown**: 
+    When a user destroys a sandbox, the orchestrator terminates the associated instance via `TerminateInstanceInAutoScalingGroupCommand` (with `ShouldDecrementDesiredCapacity: true`), reducing active instance counts to control cloud infrastructure costs.
+
+---
+
 ## 🔌 Port Mappings & Services
 
 The system is deployed containerized via Docker. Below is the mapping of host-accessible endpoints:
