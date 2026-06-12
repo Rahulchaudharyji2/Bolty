@@ -26,6 +26,7 @@ services:
       - bolt-network
 
   ws-relayer:
+    image: rahulchaudharyji/bolty-ws-relayer:latest
     build:
       context: .
       dockerfile: apps/ws_layer/Dockerfile
@@ -36,6 +37,7 @@ services:
       - bolt-network
 
   primary-backend:
+    image: rahulchaudharyji/bolty-primary-backend:latest
     build:
       context: .
       dockerfile: apps/primarybackend/Dockerfile
@@ -64,6 +66,7 @@ services:
       - bolt-network
 
   worker:
+    image: rahulchaudharyji/bolty-worker:latest
     build:
       context: .
       dockerfile: apps/worker/Dockerfile
@@ -87,6 +90,7 @@ services:
       - bolt-network
 
   frontend:
+    image: rahulchaudharyji/bolty-frontend:latest
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
