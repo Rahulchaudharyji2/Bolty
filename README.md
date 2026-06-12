@@ -10,25 +10,25 @@ The codebase is organized as a Turbopack/npm workspaces monorepo:
 
 ```mermaid
 graph TD
-    User([Browser Client]) <--> |HTTP/WS| Frontend[apps/frontend: Next.js]
-    Frontend <--> |HTTP| PrimaryBackend[apps/primarybackend: Express]
-    Frontend <--> |WS| WSRelayer[apps/ws_layer: WS Relayer]
+    User(["Browser Client"]) <--> |"HTTP/WS"| Frontend["apps/frontend: Next.js"]
+    Frontend <--> |"HTTP"| PrimaryBackend["apps/primarybackend: Express"]
+    Frontend <--> |"WS"| WSRelayer["apps/ws_layer: WS Relayer"]
     
-    PrimaryBackend <--> |DB Queries| Database[(PostgreSQL)]
+    PrimaryBackend <--> |"DB Queries"| Database[("PostgreSQL")]
     
-    subgraph AWS Cloud Infrastructure (Production)
-        Orchestrator[apps/worker-orchestrator: Express] <--> |AWS ASG API| ASG[AWS Auto Scaling Group]
-        ASG <--> |Provisions| EC2[EC2 Sandbox Instance]
+    subgraph "AWS Cloud Infrastructure (Production)"
+        Orchestrator["apps/worker-orchestrator: Express"] <--> |"AWS ASG API"| ASG["AWS Auto Scaling Group"]
+        ASG <--> |"Provisions"| EC2["EC2 Sandbox Instance"]
         
-        subgraph EC2 Instance Workspace (Per Project)
-            WSRelayer <--> |WS| Worker[apps/worker: Prompt Processor & Dev Runner]
-            Worker <--> |Actions DB| Database
-            Worker -.-> |Hosts Preview| PreviewPort[Live App Preview: 8081]
-            Worker -.-> |Volume Mount| CodeServer[apps/code-server: Monaco IDE]
+        subgraph "EC2 Instance Workspace (Per Project)"
+            WSRelayer <--> |"WS"| Worker["apps/worker: Prompt Processor & Dev Runner"]
+            Worker <--> |"Actions DB"| Database
+            Worker -.-> |"Hosts Preview"| PreviewPort["Live App Preview: 8081"]
+            Worker -.-> |"Volume Mount"| CodeServer["apps/code-server: Monaco IDE"]
         end
     end
     
-    Frontend <--> |Requests Workspace IP| Orchestrator
+    Frontend <--> |"Requests Workspace IP"| Orchestrator
 ```
 
 
@@ -70,8 +70,8 @@ sequenceDiagram
     participant Client as Web Client
     participant Frontend as Frontend App
     participant Orchestrator as Worker Orchestrator
-    participant AWS as AWS Auto Scaling (ASG)
-    participant EC2 as EC2 Instances (Workspaces)
+    participant AWS as AWS Auto Scaling
+    participant EC2 as EC2 Instances
 
     Client->>Frontend: Request Project Sandbox
     Frontend->>Orchestrator: GET /:projectId
