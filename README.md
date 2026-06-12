@@ -108,18 +108,18 @@ sequenceDiagram
 
 ## 🔌 Port Mappings & Services
 
-The system is deployed containerized via Docker. Below is the mapping of host-accessible endpoints:
+The system is deployed containerized via Docker. Below is the mapping of host-accessible endpoints and their corresponding Docker Hub images:
 
-| Service | Port (Container) | Port (Host) | Description |
-| :--- | :---: | :---: | :--- |
-| **frontend** | `3000` | **`3002`** | Next.js User Interface |
-| **primary-backend** | `3000` | **`3000`** | Project & Database APIs |
-| **ws-relayer** | `9093` | **`9093`** | WebSocket relayer server |
-| **worker** (API) | `9091` | **`9091`** | Prompts runner API |
-| **worker** (Preview) | `8081` | **`8081`** | Live preview of generated applications |
-| **code-server** | `8080` | **`8080`** | Embedded VS Code Web Interface |
-| **postgres-db** | `5432` | **`5433`** | PostgreSQL DB Instance |
-| **redis-db** | `6379` | **`6380`** | Redis Caching Instance |
+| Service | Docker Hub Image | Port (Container) | Port (Host) | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| **frontend** | `rahulchaudharyji/bolty-frontend:latest` | `3000` | **`3002`** | Next.js User Interface |
+| **primary-backend** | `rahulchaudharyji/bolty-primary-backend:latest` | `3000` | **`3000`** | Project & Database APIs |
+| **ws-relayer** | `rahulchaudharyji/bolty-ws-relayer:latest` | `9093` | **`9093`** | WebSocket relayer server |
+| **worker** (API) | `rahulchaudharyji/bolty-worker:latest` | `9091` | **`9091`** | Prompts runner API |
+| **worker** (Preview) | *Dynamic (Generated App)* | `8081` | **`8081`** | Live preview of generated applications |
+| **code-server** | `codercom/code-server:latest` | `8080` | **`8080`** | Embedded VS Code Web Interface |
+| **postgres-db** | `postgres:16-alpine` | `5432` | **`5433`** | PostgreSQL DB Instance |
+| **redis-db** | `redis:alpine` | `6379` | **`6380`** | Redis Caching Instance |
 
 ---
 
@@ -133,16 +133,20 @@ The system is deployed containerized via Docker. Below is the mapping of host-ac
 
 ### 🛠 Deployment with Docker Compose
 
-1.  Create/Configure your environment variables in the `.env` configuration files.
-2.  Start the entire stack:
+1.  **Environment Setup**: Configure your environment variables in a root `.env` file (refer to the [.env.example](file:///Users/rahulchaudhary/cohort/devops/boltapp/.env.example) template).
+2.  **Pull Pre-Built Images**: Pull the images directly from Docker Hub to avoid local build latency:
+    ```bash
+    docker compose pull
+    ```
+3.  **Start the Stack**: Launch all containerized services:
     ```bash
     docker compose up -d
     ```
-3.  Rebuild images if you make changes in the local code:
+4.  **Local Builds (Alternative)**: If you make custom changes to the source code and want to rebuild the images locally:
     ```bash
     docker compose up -d --build
     ```
-4.  Open [http://localhost:3002](http://localhost:3002) in your browser to access the application.
+5.  Open [http://localhost:3002](http://localhost:3002) in your browser to access the application.
 
 ---
 
